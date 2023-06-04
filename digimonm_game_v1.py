@@ -67,7 +67,8 @@ for _ in range(10):
     score[player2.name] += player2.play_card(player1)
 
     # Print the score after each round
-    print(f'The score is now {player1.name}: {score[player1.name]}, {player2.name}: {score[player2.name
+    print(f'The score is now {player1.name}: {score[player1.name]}, {player2.name}: {score[player2.name]}')
+
 
 
 

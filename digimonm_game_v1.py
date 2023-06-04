@@ -9,8 +9,8 @@ class Card:
         self.special = special
         self.special_ability = special_ability
 
-    def attack(self, other):
-        other.hp -= self.attack
+    def attack_opponent(self, opponent_card):
+        opponent_card.hp -= self.attack
 
     def is_alive(self):
         return self.hp > 0
@@ -21,13 +21,13 @@ class Player:
         self.color = color
         self.deck = create_deck(digimon_list)
 
-    def play_card(self, other):
+    def play_card(self, opponent):
         card = self.deck.pop(0)
         print(f"{self.color}{self.name} plays {card.name} who has {card.hp} hp, {card.attack} attack power.{Style.RESET_ALL}")
-        card.attack(other.deck[0])
-        if not other.deck[0].is_alive():
-            print(f"{self.color}{other.name}'s {other.deck[0].name} is defeated!{Style.RESET_ALL}")
-            other.deck.pop(0)
+        card.attack_opponent(opponent.deck[0])
+        if not opponent.deck[0].is_alive():
+            print(f"{self.color}{opponent.name}'s {opponent.deck[0].name} is defeated!{Style.RESET_ALL}")
+            opponent.deck.pop(0)
             return 1
         return 0
 

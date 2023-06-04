@@ -1,61 +1,68 @@
-class Digimon:
-    def __init__(self, name, hp, attack, special, special_power):
+import random
+from colorama import Fore, Style
+
+class Card:
+    def __init__(self, name, hp, attack, special, special_ability):
         self.name = name
-        self.max_hp = hp
         self.hp = hp
-        self.attack_power = attack
+        self.attack = attack
         self.special = special
-        self.special_power = special_power
-        self.special_used = False
+        self.special_ability = special_ability
 
-    def attack(self, opponent_digimon):
-        print(f'{self.name} attacks {opponent_digimon.name}!')
-        opponent_digimon.take_damage(self.attack_power)
+    def attack(self, other):
+        other.hp -= self.attack
 
-    def take_damage(self, attack_power):
-        self.hp -= attack_power  
-        print(f'{self.name} is left with {self.hp} hp.')
-
-    def is_defeated(self):
-        return self.hp <= 0
+    def is_alive(self):
+        return self.hp > 0
 
 class Player:
-    def __init__(self, name, deck):
+    def __init__(self, name, color):
         self.name = name
-        self.deck = deck
+        self.color = color
+        self.deck = create_deck(digimon_list)
 
-    def play_card(self, opponent):
-        my_digimon = self.deck[0] 
-        print(f'{self.name} plays {my_digimon.name} who has {my_digimon.hp} hp, {my_digimon.attack_power} attack power.')
+    def play_card(self, other):
+        card = self.deck.pop(0)
+        print(f"{self.color}{self.name} plays {card.name} who has {card.hp} hp, {card.attack} attack power.{Style.RESET_ALL}")
+        card.attack(other.deck[0])
+        if not other.deck[0].is_alive():
+            print(f"{self.color}{other.name}'s {other.deck[0].name} is defeated!{Style.RESET_ALL}")
+            other.deck.pop(0)
+            return 1
+        return 0
 
-        opponent_digimon = opponent.deck[0] 
-        print(f'{opponent.name}\'s Digimon is {opponent_digimon.name} who has {opponent_digimon.hp} hp, {opponent_digimon.attack_power} attack power.')
+def create_deck(digimon_list):
+    return random.sample(digimon_list, 10)
 
-        my_digimon.attack(opponent_digimon)
+# Define the list of all Digimon cards
+digimon_list = [
+    Card('Trainmon', 50, 20, 40, 'Negate attacks on the first turn.'),
+    Card('Dinomon', 60, 30, 50, 'Double attack power on the first turn.'),
+    Card('Beamon', 70, 25, 45, 'Heals 20 HP after each turn.'),
+    Card('Platimon', 75, 35, 40, 'Increases defense by 20 after each attack.'),
+    Card('Tigermon', 80, 50, 50, 'Does a counter attack with half damage.'),
+    Card('Shellmon', 90, 25, 60, 'Blocks the first attack.'),
+    Card('Flymon', 65, 35, 45, 'Dodges every third attack.'),
+    Card('Blademon', 70, 60, 30, 'Can attack twice every third turn.'),
+    Card('Stonemon', 100, 40, 50, 'Reduces received damage by 20.'),
+    Card('WindyMon', 60, 40, 70, 'Increases attack power by 15 after each successful attack.'),
+    Card('Sparkmon', 55, 70, 35, 'Paralyzes opponent every fifth turn.'),
+    Card('BunnyMon', 70, 30, 45, 'Heals 10 HP every turn.'),
+    Card('Flowermon', 60, 40, 50, 'Reduces opponent\'s attack by 15 every fourth turn.'),
+    Card('Cloudmon', 70, 50, 40, 'Doubles HP once when HP drops below 20.'),
+    Card('Spheremon', 75, 55, 50, 'Reflects half of received damage back to the opponent.'),
+    Card('Knightmon', 80, 65, 45, 'Blocks every second attack.'),
+    Card('MirrorMon', 60, 60, 60, 'Mirrors opponent\'s attack once every game.'),
+    Card('Shadowmon', 65, 70, 55, 'Becomes invulnerable every fifth turn.')
+]
 
-        if opponent_digimon.is_defeated():
-            print(f'{opponent_digimon.name} is defeated!')
-            opponent.deck.remove(opponent_digimon)
-            return 1 
-        else:
-            opponent_digimon.attack(my_digimon)
-            if my_digimon.is_defeated():
-                print(f'{my_digimon.name} is defeated!')
-                self.deck.remove(my_digimon)
-                return -1 
-        return 0 
+player1 = Player("Player 1", Fore.RED)
+player2 = Player("Player 2", Fore.GREEN)
 
-deck1 = [Digimon('Trainmon', 50, 20, 'Special Power', 'On the first turn with this player, you negate attacks to this Digimon.') for _ in range(10)]
-deck2 = [Digimon('Dynamon', 60, 25, 'Special Power', 'Revive once with half HP after defeated.') for _ in range(10)]
-
-player1 = Player('Player 1', deck1)
-player2 = Player('Player 2', deck2)
-
-score = {player1.name: 0, player2.name: 0}
-
-while deck1 and deck2: 
-    score[player1.name] += player1.play_card(player2)
-    if deck2:  # Ensure deck2 still has cards after Player1's turn
-        score[player2.name] += player2.play_card(player1)
-
-print(f'Final score is {player1.name}: {score[player1.name]}, {player2.name}: {score[player2.name]}')
+# Play until someone runs out of cards
+while player1.deck and player2.deck:
+    player1_score = player1.play_card(player2)
+    player2_score = 0
+    if player2.deck:  # If Player 2 still has cards left
+        player2_score = player2.play_card(player1)
+    print(f"{Fore.CYAN}Score after this round: Player 1 - {player1_score}, Player 2 - {player2_score}{Style.RESET_ALL}\n")

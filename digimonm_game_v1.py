@@ -22,9 +22,13 @@ class Player:
         self.deck = create_deck(digimon_list)
 
     def play_card(self, opponent):
+        if not opponent.deck:  # Check if opponent has any cards left
+            return 0
+        
         card = self.deck.pop(0)
         print(f"{self.color}{self.name} plays {card.name} who has {card.hp} hp, {card.attack} attack power.{Style.RESET_ALL}")
         card.attack_opponent(opponent.deck[0])
+        
         if not opponent.deck[0].is_alive():
             print(f"{self.color}{opponent.name}'s {opponent.deck[0].name} is defeated!{Style.RESET_ALL}")
             opponent.deck.pop(0)
@@ -60,9 +64,23 @@ player1 = Player("Player 1", Fore.RED)
 player2 = Player("Player 2", Fore.GREEN)
 
 # Play until someone runs out of cards
+# Play until someone runs out of cards
 while player1.deck and player2.deck:
     player1_score = player1.play_card(player2)
+    if not player1.deck:
+        break
     player2_score = 0
     if player2.deck:  # If Player 2 still has cards left
         player2_score = player2.play_card(player1)
     print(f"{Fore.CYAN}Score after this round: Player 1 - {player1_score}, Player 2 - {player2_score}{Style.RESET_ALL}\n")
+
+# Display final score and determine the winner
+final_score = f"Player 1: {player1_score}, Player 2: {player2_score}"
+if player1_score > player2_score:
+    print(f"{Fore.RED}Player 1 wins!{Style.RESET_ALL}")
+elif player2_score > player1_score:
+    print(f"{Fore.GREEN}Player 2 wins!{Style.RESET_ALL}")
+else:
+    print("It's a tie!")
+
+print(f"Final Score: {final_score}")
